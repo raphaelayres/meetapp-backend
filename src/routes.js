@@ -3,6 +3,7 @@ import multer from 'multer';
 import multerConfig from './config/multer';
 
 import authMidleware from './app/middlewares/auth';
+import errorMiddleware from './app/middlewares/error';
 
 import UserController from './app/controllers/UserController';
 import SessionController from './app/controllers/SessionController';
@@ -21,6 +22,11 @@ routes.put('/users', UserController.update);
 
 routes.post('/files', upload.single('file'), FileController.storage);
 
-routes.post('/meetups', upload.single('banner'), MeetupController.store);
+routes.post(
+  '/meetups',
+  upload.single('banner'),
+  errorMiddleware,
+  MeetupController.store
+);
 
 export default routes;
