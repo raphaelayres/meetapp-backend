@@ -11,7 +11,7 @@ import { Op } from 'sequelize';
 import Meetup from '../models/Meetup';
 import User from '../models/User';
 
-class MeetupController {
+class MyMeetupController {
   async index(req, res) {
     const { page = 1 } = req.query;
 
@@ -21,9 +21,7 @@ class MeetupController {
 
     const meetups = await Meetup.findAll({
       where: {
-        user_id: {
-          [Op.not]: req.userId,
-        },
+        user_id: req.userId,
         canceled_at: null,
         datetime: parseDate
           ? { [Op.between]: [startOfDay(parseDate), endOfDay(parseDate)] }
@@ -120,4 +118,4 @@ class MeetupController {
   }
 }
 
-export default new MeetupController();
+export default new MyMeetupController();
