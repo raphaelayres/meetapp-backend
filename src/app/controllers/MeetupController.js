@@ -22,7 +22,7 @@ class MeetupController {
     const meetups = await Meetup.findAll({
       where: {
         user_id: {
-          [Op.not]: req.userId,
+          [Op.ne]: req.userId,
         },
         canceled_at: null,
         datetime: parseDate
