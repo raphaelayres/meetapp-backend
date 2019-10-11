@@ -1,43 +1,16 @@
 import * as Yup from 'yup';
-import {
-  startOfHour,
-  isBefore,
-  parseISO,
-  startOfDay,
-  endOfDay,
-} from 'date-fns';
-import { Op } from 'sequelize';
+import { startOfHour, isBefore } from 'date-fns';
 
 import Meetup from '../models/Meetup';
-import User from '../models/User';
 
 class MyMeetupController {
   async index(req, res) {
-    const { page = 1 } = req.query;
-
-    const perpage = 10;
-
-    const parseDate = req.query.date ? parseISO(req.query.date) : null;
-
     const meetups = await Meetup.findAll({
       where: {
         user_id: req.userId,
-        canceled_at: null,
-        datetime: parseDate
-          ? { [Op.between]: [startOfDay(parseDate), endOfDay(parseDate)] }
-          : { [Op.ne]: null },
       },
       order: ['datetime'],
-      limit: perpage,
-      offset: (page - 1) * perpage,
       attributes: ['id', 'title', 'datetime'],
-      include: [
-        {
-          model: User,
-          as: 'organizer',
-          attributes: ['name', 'email'],
-        },
-      ],
     });
 
     return res.json(meetups);
@@ -77,6 +50,12 @@ class MyMeetupController {
   }
 
   async update(req, res) {
+    const uuidRegex = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
+
+    if (!req.params.id.match(uuidRegex)) {
+      return res.status(400).json({ error: 'Parameter id is invalid' });
+    }
+
     const schema = Yup.object().shape({
       title: Yup.string(),
       description: Yup.string(),
@@ -103,6 +82,18 @@ class MyMeetupController {
         return res.status(400).json({ error: 'Meetup was not found' });
       }
 
+      if (meetup.user_id !== req.userId) {
+        return res.status(401).json({
+          error: "You don't have permission to edit this meetup.",
+        });
+      }
+
+      if (!isBefore(new Date(), startOfHour(meetup.datetime))) {
+        return res.status(401).json({
+          error: 'you cannot edit a meetup that has already occurred',
+        });
+      }
+
       const meetupUpdated = await meetup.update(req.body);
 
       return res.json(meetupUpdated);
@@ -115,6 +106,54 @@ class MyMeetupController {
         .status(400)
         .json({ error: 'ValidationError', errors: errorList });
     }
+  }
+
+  async show(req, res) {
+    const uuidRegex = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
+
+    if (!req.params.id.match(uuidRegex)) {
+      return res.status(400).json({ error: 'Parameter id is invalid' });
+    }
+
+    const meetup = await Meetup.findByPk(req.params.id);
+
+    if (!meetup) {
+      return res.status(400).json({ error: 'Meetup was not found' });
+    }
+
+    return res.json(meetup);
+  }
+
+  async delete(req, res) {
+    const uuidRegex = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
+
+    if (!req.params.id.match(uuidRegex)) {
+      return res.status(400).json({ error: 'Parameter id is invalid' });
+    }
+
+    const meetup = await Meetup.findByPk(req.params.id);
+
+    if (!meetup) {
+      return res.status(400).json({
+        error: 'This meetup not exists',
+      });
+    }
+
+    if (meetup.user_id !== req.userId) {
+      return res.status(401).json({
+        error: "You don't have permission to cancel this meetup.",
+      });
+    }
+
+    if (!isBefore(new Date(), startOfHour(meetup.datetime))) {
+      return res.status(401).json({
+        error: 'you cannot cancel a meetup that has already occurred',
+      });
+    }
+
+    await meetup.destroy();
+
+    return res.status(204).send();
   }
 }
 

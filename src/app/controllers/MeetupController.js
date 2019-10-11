@@ -1,7 +1,7 @@
-import * as Yup from 'yup';
+// import * as Yup from 'yup';
 import {
-  startOfHour,
-  isBefore,
+  // startOfHour,
+  // isBefore,
   parseISO,
   startOfDay,
   endOfDay,
@@ -45,79 +45,85 @@ class MeetupController {
     return res.json(meetups);
   }
 
-  async store(req, res) {
-    const schema = Yup.object().shape({
-      title: Yup.string().required(),
-      description: Yup.string().required(),
-      localization: Yup.string().required(),
-      file_id: Yup.string().required(),
-      datetime: Yup.date()
-        .test('PastDate', 'Past dates are not permitted', value =>
-          isBefore(new Date(), startOfHour(value))
-        )
-        .required(),
-    });
+  // async store(req, res) {
+  //   const schema = Yup.object().shape({
+  //     title: Yup.string().required(),
+  //     description: Yup.string().required(),
+  //     localization: Yup.string().required(),
+  //     file_id: Yup.string().required(),
+  //     datetime: Yup.date()
+  //       .test('PastDate', 'Past dates are not permitted', value =>
+  //         isBefore(new Date(), startOfHour(value))
+  //       )
+  //       .required(),
+  //   });
 
-    try {
-      await schema.validate(req.body, { abortEarly: false });
+  //   try {
+  //     await schema.validate(req.body, { abortEarly: false });
 
-      const meetup = await Meetup.create({
-        user_id: req.userId,
-        ...req.body,
-      });
+  //     const meetup = await Meetup.create({
+  //       user_id: req.userId,
+  //       ...req.body,
+  //     });
 
-      return res.json(meetup);
-    } catch (err) {
-      let errorList = [];
-      errorList = err.inner.map(error => ({
-        [error.path]: error.message,
-      }));
-      return res
-        .status(400)
-        .json({ error: 'ValidationError', errors: errorList });
-    }
-  }
+  //     return res.json(meetup);
+  //   } catch (err) {
+  //     let errorList = [];
+  //     errorList = err.inner.map(error => ({
+  //       [error.path]: error.message,
+  //     }));
+  //     return res
+  //       .status(400)
+  //       .json({ error: 'ValidationError', errors: errorList });
+  //   }
+  // }
 
-  async update(req, res) {
-    const schema = Yup.object().shape({
-      title: Yup.string(),
-      description: Yup.string(),
-      localization: Yup.string(),
-      file_id: Yup.string(),
-      datetime: Yup.date().test(
-        'PastDate',
-        'Past dates are not permitted',
-        value => {
-          if (value) {
-            return isBefore(new Date(), startOfHour(value));
-          }
-          return true;
-        }
-      ),
-    });
+  // async update(req, res) {
+  //   const uuidRegex = /^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i;
 
-    try {
-      await schema.validate(req.body, { abortEarly: false });
+  //   if (!req.params.id.match(uuidRegex)) {
+  //     return res.status(400).json({ error: 'Parameter id is invalid' });
+  //   }
 
-      const meetup = await Meetup.findByPk(req.params.id);
+  //   const schema = Yup.object().shape({
+  //     title: Yup.string(),
+  //     description: Yup.string(),
+  //     localization: Yup.string(),
+  //     file_id: Yup.string(),
+  //     datetime: Yup.date().test(
+  //       'PastDate',
+  //       'Past dates are not permitted',
+  //       value => {
+  //         if (value) {
+  //           return isBefore(new Date(), startOfHour(value));
+  //         }
+  //         return true;
+  //       }
+  //     ),
+  //   });
 
-      if (!meetup) {
-        return res.status(400).json({ error: 'Meetup was not found' });
-      }
+  //   try {
+  //     await schema.validate(req.body, { abortEarly: false });
 
-      const meetupUpdated = await meetup.update(req.body);
+  //     const meetup = await Meetup.findByPk(req.params.id);
 
-      return res.json(meetupUpdated);
-    } catch (err) {
-      let errorList = [];
-      errorList = err.inner.map(error => ({
-        [error.path]: error.message,
-      }));
-      return res
-        .status(400)
-        .json({ error: 'ValidationError', errors: errorList });
-    }
-  }
+  //     if (!meetup) {
+  //       return res.status(400).json({ error: 'Meetup was not found' });
+  //     }
+
+  //     const meetupUpdated = await meetup.update(req.body);
+
+  //     return res.json(meetupUpdated);
+  //   } catch (err) {
+  //     let errorList = [];
+  //     errorList = err.inner.map(error => ({
+  //       [error.path]: error.message,
+  //     }));
+  //     return res
+  //       .status(400)
+  //       .json({ error: 'ValidationError', errors: errorList });
+  //   }
+  // }
 }
 
 export default new MeetupController();
