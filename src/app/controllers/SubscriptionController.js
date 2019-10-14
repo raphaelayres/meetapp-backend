@@ -3,6 +3,8 @@ import { startOfHour, isBefore } from 'date-fns';
 import Subscription from '../models/Subscription';
 import Meetup from '../models/Meetup';
 import File from '../models/File';
+import Mail from '../../lib/Mail';
+import User from '../models/User';
 
 class SubscriptionController {
   async index(req, res) {
@@ -41,7 +43,11 @@ class SubscriptionController {
 
       const { meetup_id } = req.body;
 
-      const meetup = await Meetup.findByPk(meetup_id);
+      const meetup = await Meetup.findByPk(meetup_id, {
+        include: [
+          { model: User, as: 'organizer', attributes: ['name', 'email'] },
+        ],
+      });
 
       if (!meetup) {
         return res.status(400).json({
@@ -76,16 +82,31 @@ class SubscriptionController {
         meetup_id,
       });
 
+      await Mail.sendMail({
+        to: `${meetup.organizer.name} <${meetup.organizer.email}>`,
+        subject: `Nova inscrição - meetup: ${meetup.title}`,
+        template: 'subscription',
+        context: {
+          organizer: meetup.organizer.name,
+          user: req.userName,
+          meetup,
+        },
+      });
+
       return res.json(subscription);
     } catch (err) {
       let errorList = [];
 
-      errorList = err.inner.map(error => ({
-        [error.path]: error.message,
-      }));
-      return res
-        .status(400)
-        .json({ error: 'ValidationError', errors: errorList });
+      if (err.inner) {
+        errorList = err.inner.map(error => ({
+          [error.path]: error.message,
+        }));
+        return res
+          .status(400)
+          .json({ error: 'ValidationError', errors: errorList });
+      }
+
+      return res.status(500).json({ error: 'Error ocurred' });
     }
   }
 
