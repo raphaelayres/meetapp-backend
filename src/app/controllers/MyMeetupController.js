@@ -18,8 +18,14 @@ class MyMeetupController {
 
   async store(req, res) {
     const schema = Yup.object().shape({
-      title: Yup.string().required(),
-      description: Yup.string().required(),
+      title: Yup.string()
+        .min(5)
+        .max(40)
+        .required(),
+      description: Yup.string()
+        .min(100)
+        .max(255)
+        .required(),
       localization: Yup.string().required(),
       file_id: Yup.string().required(),
       datetime: Yup.date()
@@ -57,8 +63,10 @@ class MyMeetupController {
     }
 
     const schema = Yup.object().shape({
-      title: Yup.string(),
-      description: Yup.string(),
+      title: Yup.string()
+        .min(5)
+        .max(40),
+      description: Yup.string.min(100).max(255)(),
       localization: Yup.string(),
       file_id: Yup.string(),
       datetime: Yup.date().test(
