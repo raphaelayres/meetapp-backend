@@ -21,7 +21,7 @@ module.exports = {
           user_id: users[index].id,
           file_id: files[index].id,
           title: faker.lorem.words(3),
-          description: faker.lorem.sentences(2),
+          description: faker.lorem.paragraphs(),
           localization: faker.address.streetAddress(),
           datetime: faker.date.recent(90),
           created_at: faker.date.recent(90),

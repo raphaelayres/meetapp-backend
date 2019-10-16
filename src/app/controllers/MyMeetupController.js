@@ -25,7 +25,6 @@ class MyMeetupController {
         .required(),
       description: Yup.string()
         .min(100)
-        .max(255)
         .required(),
       localization: Yup.string().required(),
       file_id: Yup.string().required(),
@@ -67,7 +66,7 @@ class MyMeetupController {
       title: Yup.string()
         .min(5)
         .max(40),
-      description: Yup.string.min(100).max(255)(),
+      description: Yup.string().min(100),
       localization: Yup.string(),
       file_id: Yup.string(),
       datetime: Yup.date().test(
