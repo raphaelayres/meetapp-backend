@@ -2,6 +2,7 @@ import * as Yup from 'yup';
 import { startOfHour, isBefore } from 'date-fns';
 
 import Meetup from '../models/Meetup';
+import File from '../models/File';
 
 class MyMeetupController {
   async index(req, res) {
@@ -123,7 +124,16 @@ class MyMeetupController {
       return res.status(400).json({ error: 'Parameter id is invalid' });
     }
 
-    const meetup = await Meetup.findByPk(req.params.id);
+    const meetup = await Meetup.findByPk(req.params.id, {
+      include: [
+        {
+          model: File,
+          as: 'banner',
+          attributes: ['path'],
+        },
+      ],
+      attributes: ['title', 'description', 'datetime', 'localization'],
+    });
 
     if (!meetup) {
       return res.status(400).json({ error: 'Meetup was not found' });
