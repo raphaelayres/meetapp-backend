@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import path from 'path';
 import express from 'express';
 import cors from 'cors';
 import routes from './routes';
@@ -7,14 +8,19 @@ import './database';
 class App {
   constructor() {
     this.server = express();
-    this.server.use(cors());
-    this.server.use(express.json());
 
     this.middlewares();
     this.routes();
   }
 
-  middlewares() {}
+  middlewares() {
+    this.server.use(cors());
+    this.server.use(express.json());
+    this.server.use(
+      '/meetups/banner',
+      express.static(path.resolve(__dirname, '..', 'tmp', 'uploads'))
+    );
+  }
 
   routes() {
     this.server.use(routes);

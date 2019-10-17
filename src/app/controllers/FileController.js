@@ -11,9 +11,12 @@ class FileController {
 
     const { filename: path, originalname: name } = req.file;
 
-    const file = await File.create({ name, path });
+    const file = await File.create({
+      name,
+      path: `${process.env.APP_URL}/meetups/banner/${path}`,
+    });
 
-    return res.json(file);
+    return res.json({ file });
   }
 }
 
