@@ -19,7 +19,7 @@ module.exports = {
       for (let i = 0; i < total; i += 1) {
         items.push({
           user_id: users[index].id,
-          file_id: files[index].id,
+          file_id: files[i].id,
           title: faker.lorem.words(3),
           description: faker.lorem.paragraphs(),
           localization: faker.address.streetAddress(),
