@@ -2,7 +2,7 @@ import multer from 'multer';
 import crypto from 'crypto';
 import { extname, resolve } from 'path';
 
-const accepted_extensions = ['jpg', 'png', 'gif'];
+const accepted_extensions = ['jpg', 'jpeg', 'png', 'gif'];
 
 export default {
   storage: multer.diskStorage({
