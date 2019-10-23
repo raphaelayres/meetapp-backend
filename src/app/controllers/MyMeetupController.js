@@ -128,7 +128,7 @@ class MyMeetupController {
         {
           model: File,
           as: 'banner',
-          attributes: ['path'],
+          attributes: ['id', 'path'],
         },
       ],
       attributes: ['id', 'title', 'description', 'datetime', 'localization'],
