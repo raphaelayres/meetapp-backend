@@ -24,7 +24,7 @@ class MyMeetupController {
         .max(40)
         .required(),
       description: Yup.string()
-        .min(100)
+        .min(10)
         .required(),
       localization: Yup.string().required(),
       file_id: Yup.string().required(),
@@ -66,7 +66,7 @@ class MyMeetupController {
       title: Yup.string()
         .min(5)
         .max(40),
-      description: Yup.string().min(100),
+      description: Yup.string().min(10),
       localization: Yup.string(),
       file_id: Yup.string(),
       datetime: Yup.date().test(
@@ -131,7 +131,7 @@ class MyMeetupController {
           attributes: ['path'],
         },
       ],
-      attributes: ['title', 'description', 'datetime', 'localization'],
+      attributes: ['id', 'title', 'description', 'datetime', 'localization'],
     });
 
     if (!meetup) {
