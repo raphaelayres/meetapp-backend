@@ -1,15 +1,9 @@
-// import * as Yup from 'yup';
-import {
-  // startOfHour,
-  // isBefore,
-  parseISO,
-  startOfDay,
-  endOfDay,
-} from 'date-fns';
+import { parseISO, startOfDay, endOfDay } from 'date-fns';
 import { Op } from 'sequelize';
 
 import Meetup from '../models/Meetup';
 import User from '../models/User';
+import File from '../models/File';
 
 class MeetupController {
   async index(req, res) {
@@ -38,6 +32,11 @@ class MeetupController {
           model: User,
           as: 'organizer',
           attributes: ['name', 'email'],
+        },
+        {
+          model: File,
+          as: 'banner',
+          attributes: ['id', 'path'],
         },
       ],
     });

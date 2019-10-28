@@ -131,7 +131,14 @@ class MyMeetupController {
           attributes: ['id', 'path'],
         },
       ],
-      attributes: ['id', 'title', 'description', 'datetime', 'localization'],
+      attributes: [
+        'id',
+        'title',
+        'description',
+        'datetime',
+        'past',
+        'localization',
+      ],
     });
 
     if (!meetup) {
